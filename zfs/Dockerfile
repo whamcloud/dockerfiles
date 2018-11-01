@@ -10,4 +10,4 @@ RUN curl https://sh.rustup.rs -sSf > /rustup.sh \
   && /rustup.sh -y \
   && rm -f /rustup.sh
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN npm i -g neon-cli
+RUN npm i -g neon-cli@0.1.23
