@@ -1,0 +1,24 @@
+sudo: required
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: build
+      name: "Build ZFS"
+      script:
+        - cd zfs
+        - docker build -t zfs .
+        - docker history zfs
+    - stage: cd_zfs
+      name: "ZFS Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd zfs
+        - docker build --rm -t imlteam/zfs .
+        - docker push imlteam/zfs
+stages:
+  - build
+  - name: cd_zfs
+    if: branch = master AND type = push AND fork = false
