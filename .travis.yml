@@ -11,6 +11,12 @@ jobs:
         - cd zfs
         - docker build -t zfs .
         - docker history zfs
+    - stage: build
+      name: "Build mock"
+      script:
+        - cd mock
+        - docker build -t mock .
+        - docker history mock
     - stage: cd_zfs
       name: "ZFS Continuous Deployment"
       script:
@@ -18,7 +24,16 @@ jobs:
         - cd zfs
         - docker build --rm -t imlteam/zfs .
         - docker push imlteam/zfs
+    - stage: cd_mock
+      name: "Mock Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd mock
+        - docker build --rm -t imlteam/mock .
+        - docker push imlteam/mock
 stages:
   - build
   - name: cd_zfs
+    if: branch = master AND type = push AND fork = false
+  - name: cd_mock
     if: branch = master AND type = push AND fork = false
