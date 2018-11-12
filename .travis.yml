@@ -31,9 +31,18 @@ jobs:
         - cd mock
         - docker build --rm -t imlteam/mock .
         - docker push imlteam/mock
+    - stage: cd_copr
+      name: "Copr Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr
+        - docker build --rm -t imlteam/copr .
+        - docker push imlteam/copr
 stages:
   - build
   - name: cd_zfs
     if: branch = master AND type = push AND fork = false
   - name: cd_mock
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr
     if: branch = master AND type = push AND fork = false
