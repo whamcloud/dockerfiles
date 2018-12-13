@@ -8,5 +8,3 @@ RUN yum -y install epel-release yum-plugin-copr \
   && yum clean all \
   && rm -rf /var/cache/yum \
   && sed -i $'1i config_opts[\'use_nspawn\'] = False' /etc/mock/default.cfg
-
-RUN useradd --gid mock mockbuild
