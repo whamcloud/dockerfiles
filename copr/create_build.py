@@ -38,7 +38,7 @@ build = client.package_proxy.build(*args)
 
 while client.build_proxy.get(build.id).state in ["running", "pending", "starting", "importing"]:
     time.sleep(10)
-    print("{} running. State: {}".format(build.id), client.build_proxy.get(build.id).state)
+    print("{} running. State: {}".format(build.id, client.build_proxy.get(build.id).state))
 
 final_state = client.build_proxy.get(build.id).state
 
