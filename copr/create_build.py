@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 import subprocess
 import time
 import os
 import sys
+import glob
 from copr.v3 import Client, CoprNoResultException
 
 key = os.environ["KEY"]
@@ -11,30 +12,35 @@ iv = os.environ["IV"]
 
 owner = os.environ["OWNER"]
 project = os.environ["PROJECT"]
-package = os.environ["PACKAGE"]
-clone_url = os.environ["CLONE_URL"]
+package = os.environ.get("PACKAGE")
+clone_url = os.environ.get("CLONE_URL")
+spec = os.environ.get("SPEC")
 ish = os.environ.get("COMMITISH", "master")
-spec = os.environ["SPEC"]
+srpm_path = os.environ.get("SRPM_PATH")
 
-res = subprocess.run(
+subprocess.call(
     ["openssl", "aes-256-cbc", "-K", key, "-iv", iv, "-in", "/tmp/copr-mfl.enc", "-out", "/root/.config/copr", "-d"]
 )
-
-if res.stderr:
-    print("stdout: {}, stderr: {}".format(res.stdout, res.stderr))
 
 client = Client.create_from_config_file()
 
 args = (owner, project, package)
 
-try:
-    client.package_proxy.get(*args)
-except CoprNoResultException:
-    client.package_proxy.add(
-        *args, source_type="scm", source={"clone_url": clone_url, "source_build_method": "make_srpm", "spec": spec}
-    )
+if srpm_path:
+    p = glob.glob(srpm_path).pop()
 
-build = client.package_proxy.build(*args)
+    build = client.build_proxy.create_from_file(owner, project, p)
+else:
+    try:
+        client.package_proxy.get(*args)
+    except CoprNoResultException:
+        client.package_proxy.add(
+            *args,
+            source_type="scm",
+            source_dict={"clone_url": clone_url, "source_build_method": "make_srpm", "spec": spec, "committish": ish}
+        )
+
+    build = client.package_proxy.build(*args)
 
 while client.build_proxy.get(build.id).state in ["running", "pending", "starting", "importing"]:
     time.sleep(10)
@@ -42,7 +48,7 @@ while client.build_proxy.get(build.id).state in ["running", "pending", "starting
 
 final_state = client.build_proxy.get(build.id).state
 
-print("build {} finshed. State: {}".format(build.id, final_state))
+print("build {} {}".format(build.id, final_state))
 
 
 if final_state == "failed":
