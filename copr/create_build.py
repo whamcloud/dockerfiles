@@ -47,11 +47,11 @@ else:
     try:
         client.package_proxy.get(*args)
     except CoprNoResultException:
-        client.package_proxy.add(
-            *args,
-            source_type="scm",
-            source_dict={"clone_url": clone_url, "source_build_method": "make_srpm", "spec": spec, "committish": ish}
-        )
+        source_dict = {"clone_url": clone_url, "source_build_method": "make_srpm", "spec": spec, "committish": ish}
+        if project_dirname is not None:
+            source_dict["subdirectory"] = project_dirname
+
+        client.package_proxy.add(*args, source_type="scm", source_dict=source_dict)
 
     build = client.package_proxy.build(*args, buildopts=None, project_dirname=project_dirname)
 
