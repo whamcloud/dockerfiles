@@ -71,11 +71,8 @@ iv = os.environ["IV"]
 owner = os.environ["OWNER"]
 project = os.environ["PROJECT"]
 package = os.environ.get("PACKAGE")
-clone_url = os.environ.get("CLONE_URL")
 spec = os.environ.get("SPEC")
-ish = os.environ.get("COMMITISH", "master")
 srpm_path = os.environ.get("SRPM_PATH", "/tmp/*.src.rpm")
-project_dirname = os.environ.get("PROJECT_DIRNAME")
 prod = os.environ.get("PROD", False)
 
 subprocess.call(
@@ -95,8 +92,8 @@ except CoprNoResultException:
 
 try:
     p = glob.glob(srpm_path).pop()
-except Exception:
-    if not prod:
+except:
+    if not prod in ["TRUE", "True", "true", "t", "T", "Y", "y", "YES", "Yes", "yes"]:
         spec_file = get_spec_file()
         epoch = int(time.time())
         builds = client.build_proxy.get_list(*args, status="succeeded")
