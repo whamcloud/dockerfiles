@@ -4,6 +4,8 @@ RUN yum install -y dnf epel-release \
   && yum install -y yum-plugin-copr \
   && dnf install -y 'dnf-command(copr)' \
   && dnf install -y python openssl \
+  && dnf install -y python-pip \
+  && pip install packaging \
   && dnf copr enable -y @copr/copr \
   && dnf install -y copr-cli \
   && yum -y copr enable -y managerforlustre/buildtools \
