@@ -9,7 +9,7 @@ import re
 from copr.v3 import Client, CoprNoResultException
 from packaging import version
 
-version_regex = r"(\d+\.\d+\.\d)+-\d+\.(\d+)\..+"
+version_regex = r"(\d+\.\d+\.\d)+-(?:\d+\.(\d+)|(\d+))\..+"
 
 
 def get_version_from_spec(spec_file):
@@ -40,12 +40,12 @@ def get_release_num(builds, version_regex, spec_file):
         build = sorted(builds, key=lambda x: x.ended_on, reverse=True)[0]
         v = build.source_package.get("version")
         matches = re.match(version_regex, v)
-        ver = matches.group(1)
+        ver, rel = [x for x in matches.groups() if x is not None]
 
         spec_ver = get_version_from_spec(spec_file)
 
         if version.parse(ver) == version.parse(spec_ver):
-            release_num = int(matches.group(2)) + 1
+            release_num = rel + 1
     except Exception:
         print("Initial build.")
 
