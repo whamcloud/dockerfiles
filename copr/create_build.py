@@ -7,17 +7,6 @@ import sys
 import glob
 import re
 from copr.v3 import Client, CoprNoResultException
-from packaging import version
-
-version_regex = r"(\d+\.\d+\.\d)+-(?:\d+\.(\d+)|(\d+))\..+"
-
-
-def get_version_from_spec(spec_file):
-    file = open(spec_file, "r")
-    spec = file.read()
-    file.close()
-
-    return re.match(r".*Version:.*(\d+\.\d+\.\d+).*", spec, re.DOTALL).group(1)
 
 
 def update_spec_with_new_release(spec_file, release_num):
@@ -31,25 +20,6 @@ def update_spec_with_new_release(spec_file, release_num):
         spec,
         re.DOTALL,
     )
-
-
-def get_release_num(builds, version_regex, spec_file):
-    release_num = 1
-
-    try:
-        build = sorted(builds, key=lambda x: x.ended_on, reverse=True)[0]
-        v = build.source_package.get("version")
-        matches = re.match(version_regex, v)
-        ver, rel = [x for x in matches.groups() if x is not None]
-
-        spec_ver = get_version_from_spec(spec_file)
-
-        if version.parse(ver) == version.parse(spec_ver):
-            release_num = rel + 1
-    except Exception:
-        print("Initial build.")
-
-    return release_num
 
 
 def get_spec_file():
@@ -93,13 +63,11 @@ except CoprNoResultException:
 try:
     p = glob.glob(srpm_path).pop()
 except:
-    if not prod in ["TRUE", "True", "true", "t", "T", "Y", "y", "YES", "Yes", "yes"]:
+    if prod not in ["TRUE", "True", "true", "t", "T", "Y", "y", "YES", "Yes", "yes"]:
         spec_file = get_spec_file()
         epoch = int(time.time())
-        builds = client.build_proxy.get_list(*args, status="succeeded")
-        release_num = get_release_num(builds, version_regex, spec_file)
 
-        updated_spec = update_spec_with_new_release(spec_file, "{}.{}".format(epoch, release_num))
+        updated_spec = update_spec_with_new_release(spec_file, "{}".format(epoch))
         write_new_spec(spec_file, updated_spec)
 
     # Build the SRPM
