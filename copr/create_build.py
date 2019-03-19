@@ -8,15 +8,21 @@ import glob
 import re
 from copr.v3 import Client, CoprNoResultException
 
+version_regex = r"(\d+\.\d+\.\d+)-(?:\d+\.(\d+)|(\d+))\..+"
 
-def update_spec_with_new_release(spec_file, release_num):
+
+def update_spec_with_new_release(spec_file):
     file = open(spec_file, "r")
     spec = file.read()
     file.close()
 
+    release_matches = re.match(r".*# Release Start\nRelease:.*(\d)%{\?dist}\n# Release End.*", spec, re.DOTALL)
+    cur_rel = [x for x in release_matches.groups() if x is not None].pop()
+    new_rel = "{}.{}".format(int(time.time()), cur_rel)
+
     return re.sub(
         r".*# Release Start\nRelease:.*(\d)%{\?dist}\n# Release End.*",
-        "# Release Start\nRelease:    {}{}\n# Release End".format(release_num, "%{?dist}"),
+        "# Release Start\nRelease:    {}{}\n# Release End".format(new_rel, "%{?dist}"),
         spec,
         re.DOTALL,
     )
@@ -65,9 +71,8 @@ try:
 except:
     if prod not in ["TRUE", "True", "true", "t", "T", "Y", "y", "YES", "Yes", "yes"]:
         spec_file = get_spec_file()
-        epoch = int(time.time())
 
-        updated_spec = update_spec_with_new_release(spec_file, "{}".format(epoch))
+        updated_spec = update_spec_with_new_release(spec_file)
         write_new_spec(spec_file, updated_spec)
 
     # Build the SRPM
