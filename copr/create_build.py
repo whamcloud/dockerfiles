@@ -56,7 +56,7 @@ def get_spec_file():
     try:
         return glob.glob("*.spec").pop()
     except:
-        raise "Spec file could not be found!"
+        raise Exception("Spec file could not be found!")
 
 
 def write_new_spec(spec_file, new_data):
