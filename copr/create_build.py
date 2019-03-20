@@ -54,7 +54,7 @@ local_only = os.environ.get("LOCAL_ONLY", False)
 
 try:
     p = glob.glob(srpm_path).pop()
-except:
+except Exception:
     if prod not in valid_truthy_args:
         print("Development Mode: Updating release to include new epoch.")
         spec_file = get_spec_file()
@@ -90,6 +90,12 @@ else:
     client = Client.create_from_config_file()
 
     args = (owner, project, package)
+
+    try:
+        client.project_proxy.get(owner, project)
+    except CoprNoResultException:
+        print("project {}/{} not found. Creating it.".format(owner, project))
+        client.project_proxy.add(owner, project, ["epel-7-x86_64"])
 
     print("Uploading SRPM to Copr.")
     build = client.build_proxy.create_from_file(owner, project, p)
