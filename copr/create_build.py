@@ -46,7 +46,7 @@ def get_release_num(builds, version_regex, spec_file):
 
         if version.parse(ver) == version.parse(spec_ver):
             release_num = int(matches.group(2)) + 1
-    except:
+    except Exception:
         print("Initial build.")
 
     return release_num
@@ -55,7 +55,7 @@ def get_release_num(builds, version_regex, spec_file):
 def get_spec_file():
     try:
         return glob.glob("*.spec").pop()
-    except:
+    except Exception:
         raise Exception("Spec file could not be found!")
 
 
@@ -86,10 +86,16 @@ client = Client.create_from_config_file()
 
 args = (owner, project, package)
 
+try:
+    client.project_proxy.get(owner, project)
+except CoprNoResultException:
+    print("project {}/{} not found. Creating it.".format(owner, project))
+    client.project_proxy.add("manager-for-lustre", "test2", ["epel-7-x86_64"])
+
 
 try:
     p = glob.glob(srpm_path).pop()
-except:
+except Exception:
     if not prod:
         spec_file = get_spec_file()
         epoch = int(time.time())
