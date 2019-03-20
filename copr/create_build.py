@@ -96,10 +96,10 @@ except:
 
 if local_only in valid_truthy_args:
     print("Building the RPM from SRPM Locally.")
-    subprocess.call(["rpmbuild", "--rebuild", p], cwd="/build")
+    subprocess.call(["rpmbuild", "--rebuild", p])
     rpm = glob.glob("/root/rpmbuild/RPMS/x86_64/*.rpm").pop()
     subprocess.call(["mv", rpm, "/build"])
-    print("RPM location: /build/{}".format(rpm))
+    print("RPM location: /build/{}".format(os.path.basename(rpm)))
 else:
     print("Uploading SRPM to Copr.")
     build = client.build_proxy.create_from_file(owner, project, p)
