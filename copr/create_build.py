@@ -77,11 +77,9 @@ except Exception:
     p = glob.glob(srpm_path).pop()
 
 if local_only in valid_truthy_args:
-    print("Building the RPM from SRPM Locally.")
-    subprocess.call(["rpmbuild", "--rebuild", p])
-    rpm = glob.glob("/root/rpmbuild/RPMS/**/*.rpm").pop()
-    subprocess.call(["mv", rpm, "/build"])
-    print("RPM location: /build/{}".format(os.path.basename(rpm)))
+    print("Building the RPM's from SRPM Locally.")
+    subprocess.call(["rpmbuild", "--rebuild", p, "-D", "%_topdir /build/_topdir"], cwd="/build")
+    print("RPM's located under: /build/_topdir/RPMS")
 else:
     subprocess.call(
         ["openssl", "aes-256-cbc", "-K", key, "-iv", iv, "-in", "/tmp/copr-mfl.enc", "-out", "/root/.config/copr", "-d"]
