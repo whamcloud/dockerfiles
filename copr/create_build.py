@@ -107,7 +107,8 @@ except:
             "/build/.copr/Makefile",
             "srpm",
             "outdir={}".format(srpm_path.replace(os.path.basename(srpm_path), "")),
-        ]
+        ],
+        cwd="/build",
     )
 
     p = glob.glob(srpm_path).pop()
