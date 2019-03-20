@@ -90,7 +90,7 @@ try:
     client.project_proxy.get(owner, project)
 except CoprNoResultException:
     print("project {}/{} not found. Creating it.".format(owner, project))
-    client.project_proxy.add("manager-for-lustre", "test2", ["epel-7-x86_64"])
+    client.project_proxy.add(owner, project, ["epel-7-x86_64"])
 
 
 try:
