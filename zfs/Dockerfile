@@ -1,6 +1,6 @@
-FROM centos:centos7.5.1804
+FROM centos:centos7.6
 
-RUN yum -y install epel-release yum-plugin-copr http://download.zfsonlinux.org/epel/zfs-release.el7_5.noarch.rpm \
+RUN yum -y install epel-release yum-plugin-copr http://download.zfsonlinux.org/epel/zfs-release.el7_6.noarch.rpm \
   && yum -y copr enable alonid/llvm-5.0.0 \
   && yum -y install nodejs clang-5.0.0 zfs libzfs2-devel --nogpgcheck \
   && yum clean all \
