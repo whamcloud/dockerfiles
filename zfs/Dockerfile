@@ -1,4 +1,4 @@
-FROM centos:centos7.6
+FROM centos
 
 RUN yum -y install epel-release yum-plugin-copr http://download.zfsonlinux.org/epel/zfs-release.el7_6.noarch.rpm \
   && yum -y copr enable alonid/llvm-5.0.0 \
