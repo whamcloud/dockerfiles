@@ -47,6 +47,7 @@ project = os.environ.get("PROJECT", "")
 package = os.environ.get("PACKAGE", "")
 spec = os.environ.get("SPEC")
 srpm_path = os.environ.get("SRPM_PATH", "/tmp/*.src.rpm")
+srpm_task = os.environ.get("SRPM_TASK", "srpm")
 prod = os.environ.get("PROD", False)
 local_only = os.environ.get("LOCAL_ONLY", False)
 
@@ -66,7 +67,7 @@ except Exception:
             "make",
             "-f",
             "/build/.copr/Makefile",
-            "srpm",
+            srpm_task,
             "outdir={}".format(srpm_path.replace(os.path.basename(srpm_path), "")),
         ],
         cwd="/build",
