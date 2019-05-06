@@ -26,9 +26,15 @@ jobs:
     - stage: build
       name: "Build Copr Lustre"
       script:
-        - cd lustre-client
+        - cd copr-lustre-client
         - docker build -t copr-lustre .
         - docker history copr-lustre
+    - stage: build
+      name: "Build Copr ZFS"
+      script:
+        - cd copr-zfs
+        - docker build -t copr-zfs .
+        - docker history copr-zfs
     - stage: cd_zfs
       name: "ZFS Continuous Deployment"
       script:
@@ -54,9 +60,17 @@ jobs:
       name: "Copr Lustre Continuous Deployment"
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - cd lustre-client
+        - cd copr-lustre-client
         - docker build --rm -t imlteam/copr-lustre .
         - docker push imlteam/copr-lustre
+
+    - stage: cd_copr_zfs
+      name: "Copr ZFS Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-zfs
+        - docker build --rm -t imlteam/copr-zfs .
+        - docker push imlteam/copr-zfs
 stages:
   - build
   - name: cd_zfs
@@ -66,4 +80,6 @@ stages:
   - name: cd_copr
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_lustre
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr_zfs
     if: branch = master AND type = push AND fork = false
