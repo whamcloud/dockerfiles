@@ -35,6 +35,12 @@ jobs:
         - cd copr-zfs
         - docker build -t copr-zfs .
         - docker history copr-zfs
+    - stage: build
+      name: "Build Copr Dotnet"
+      script:
+        - cd copr-dotnet
+        - docker build -t copr-dotnet .
+        - docker history copr-dotnet
     - stage: cd_zfs
       name: "ZFS Continuous Deployment"
       script:
@@ -63,7 +69,6 @@ jobs:
         - cd copr-lustre-client
         - docker build --rm -t imlteam/copr-lustre .
         - docker push imlteam/copr-lustre
-
     - stage: cd_copr_zfs
       name: "Copr ZFS Continuous Deployment"
       script:
@@ -71,6 +76,13 @@ jobs:
         - cd copr-zfs
         - docker build --rm -t imlteam/copr-zfs .
         - docker push imlteam/copr-zfs
+    - stage: cd_copr_dotnet
+      name: "Copr Dotnet Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-dotnet
+        - docker build --rm -t imlteam/copr-dotnet .
+        - docker push imlteam/copr-dotnet
 stages:
   - build
   - name: cd_zfs
