@@ -18,6 +18,12 @@ jobs:
         - docker build -t mock .
         - docker history mock
     - stage: build
+      name: "Build Copr"
+      script:
+        - cd copr
+        - docker build -t copr .
+        - docker history copr
+    - stage: build
       name: "Build Copr Lustre"
       script:
         - cd lustre-client
