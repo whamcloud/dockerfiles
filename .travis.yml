@@ -108,7 +108,7 @@ stages:
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_zfs
     if: branch = master AND type = push AND fork = false
-  -name: cd_copr_wasm
+  - name: cd_copr_wasm
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_dotnet
     if: branch = master AND type = push AND fork = false
