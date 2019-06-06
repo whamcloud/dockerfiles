@@ -22,15 +22,11 @@ def update_spec_with_new_release(spec_file):
     print("New release value: {}".format(new_rel))
 
     return re.sub(
-        release_regex, "# Release Start\nRelease:    {}{}\n# Release End".format(new_rel, "%{?dist}"), spec, re.DOTALL
+        release_regex,
+        "# Release Start\nRelease:    {}{}\n# Release End".format(new_rel, "%{?dist}"),
+        spec,
+        re.DOTALL,
     )
-
-
-def get_spec_file():
-    try:
-        return glob.glob("*.spec").pop()
-    except Exception:
-        raise Exception("Spec file could not be found!")
 
 
 def write_new_spec(spec_file, new_data):
@@ -56,10 +52,9 @@ try:
 except Exception:
     if prod not in valid_truthy_args:
         print("Development Mode: Updating release to include new epoch.")
-        spec_file = get_spec_file()
 
-        updated_spec = update_spec_with_new_release(spec_file)
-        write_new_spec(spec_file, updated_spec)
+        updated_spec = update_spec_with_new_release(spec)
+        write_new_spec(spec, updated_spec)
 
     # Build the SRPM
     subprocess.call(
@@ -77,11 +72,25 @@ except Exception:
 
 if local_only in valid_truthy_args:
     print("Building the RPM's from SRPM Locally.")
-    subprocess.call(["rpmbuild", "--rebuild", p, "-D", "%_topdir /build/_topdir"], cwd="/build")
+    subprocess.call(
+        ["rpmbuild", "--rebuild", p, "-D", "%_topdir /build/_topdir"], cwd="/build"
+    )
     print("RPM's located under: /build/_topdir/RPMS")
 else:
     subprocess.call(
-        ["openssl", "aes-256-cbc", "-K", key, "-iv", iv, "-in", "/tmp/copr-mfl.enc", "-out", "/root/.config/copr", "-d"]
+        [
+            "openssl",
+            "aes-256-cbc",
+            "-K",
+            key,
+            "-iv",
+            iv,
+            "-in",
+            "/tmp/copr-mfl.enc",
+            "-out",
+            "/root/.config/copr",
+            "-d",
+        ]
     )
 
     client = Client.create_from_config_file()
@@ -97,9 +106,18 @@ else:
     print("Uploading SRPM to Copr.")
     build = client.build_proxy.create_from_file(owner, project, p)
 
-    while client.build_proxy.get(build.id).state in ["running", "pending", "starting", "importing"]:
+    while client.build_proxy.get(build.id).state in [
+        "running",
+        "pending",
+        "starting",
+        "importing",
+    ]:
         time.sleep(10)
-        print("{} running. State: {}".format(build.id, client.build_proxy.get(build.id).state))
+        print(
+            "{} running. State: {}".format(
+                build.id, client.build_proxy.get(build.id).state
+            )
+        )
 
     final_state = client.build_proxy.get(build.id).state
 
