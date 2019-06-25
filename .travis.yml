@@ -47,6 +47,12 @@ jobs:
         - cd copr-dotnet
         - docker build -t copr-dotnet .
         - docker history copr-dotnet
+    - stage: build
+      name: "Build Node"
+      script:
+        - cd copr-node
+        - docker build -t copr-node .
+        - docker history copr-node
     - stage: cd_zfs
       name: "ZFS Continuous Deployment"
       script:
@@ -96,6 +102,13 @@ jobs:
         - cd copr-dotnet
         - docker build --rm -t imlteam/copr-dotnet .
         - docker push imlteam/copr-dotnet
+    - stage: cd_copr_node
+      name: "Copr Node Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-node
+        - docker build --rm -t imlteam/copr-node .
+        - docker push imlteam/copr-node
 stages:
   - build
   - name: cd_zfs
@@ -111,4 +124,6 @@ stages:
   - name: cd_copr_wasm
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_dotnet
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr_node
     if: branch = master AND type = push AND fork = false
