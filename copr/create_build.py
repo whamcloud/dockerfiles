@@ -20,7 +20,7 @@ def update_spec_with_new_release(spec_file):
     release_matches = re.match(release_regex, spec, re.DOTALL)
     cur_rel = [x for x in release_matches.groups() if x is not None].pop()
     print("Current release value: {}".format(cur_rel))
-    new_rel = "{}.{}".format(int(time.time()), cur_rel)
+    new_rel = "{}.{}".format(cur_rel, int(time.time()))
     print("New release value: {}".format(new_rel))
 
     return re.sub(
