@@ -8,7 +8,6 @@ import glob
 import re
 from copr.v3 import Client, CoprNoResultException
 
-release_regex = r".*# Release Start\nRelease:\s*(?:\d+|\d+\.\d+).*\n# Release End.*"
 valid_truthy_args = ["TRUE", "True", "true", "t", "T", "Y", "y", "YES", "Yes", "yes"]
 
 
@@ -17,15 +16,9 @@ def update_spec_with_new_release(spec_file):
     spec = file.read()
     file.close()
 
-    release_matches = re.match(release_regex, spec, re.DOTALL)
-    new_rel = "0.{}".format(int(time.time()))
-    print("New release value: {}".format(new_rel))
-
+    release_regex = r".*# Release Start\nRelease:\s*(\d+|\d+\.\d+)(.*)\n# Release End.*"
     return re.sub(
-        release_regex,
-        "# Release Start\nRelease:    {}{}\n# Release End".format(new_rel, "%{?dist}"),
-        spec,
-        re.DOTALL,
+        release_regex, "# Release Start\nRelease:    \\1.{}\\2\n# Release End".format(int(time.time())), spec, re.DOTALL
     )
 
 
@@ -72,25 +65,11 @@ except Exception:
 
 if local_only in valid_truthy_args:
     print("Building the RPM's from SRPM Locally.")
-    subprocess.call(
-        ["rpmbuild", "--rebuild", p, "-D", "%_topdir /build/_topdir"], cwd="/build"
-    )
+    subprocess.call(["rpmbuild", "--rebuild", p, "-D", "%_topdir /build/_topdir"], cwd="/build")
     print("RPM's located under: /build/_topdir/RPMS")
 else:
     subprocess.call(
-        [
-            "openssl",
-            "aes-256-cbc",
-            "-K",
-            key,
-            "-iv",
-            iv,
-            "-in",
-            "/tmp/copr-mfl.enc",
-            "-out",
-            "/root/.config/copr",
-            "-d",
-        ]
+        ["openssl", "aes-256-cbc", "-K", key, "-iv", iv, "-in", "/tmp/copr-mfl.enc", "-out", "/root/.config/copr", "-d"]
     )
 
     client = Client.create_from_config_file()
@@ -106,18 +85,9 @@ else:
     print("Uploading SRPM to Copr.")
     build = client.build_proxy.create_from_file(owner, project, p)
 
-    while client.build_proxy.get(build.id).state in [
-        "running",
-        "pending",
-        "starting",
-        "importing",
-    ]:
+    while client.build_proxy.get(build.id).state in ["running", "pending", "starting", "importing"]:
         time.sleep(10)
-        print(
-            "{} running. State: {}".format(
-                build.id, client.build_proxy.get(build.id).state
-            )
-        )
+        print("{} running. State: {}".format(build.id, client.build_proxy.get(build.id).state))
 
     final_state = client.build_proxy.get(build.id).state
 
