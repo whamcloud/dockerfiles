@@ -8,7 +8,7 @@ import glob
 import re
 from copr.v3 import Client, CoprNoResultException
 
-release_regex = r".*# Release Start\nRelease:\s*(\d+|\d+\.\d+).*\n# Release End.*"
+release_regex = r".*# Release Start\nRelease:\s*(\d+|\d+\.\d+)(.*)\n# Release End.*"
 valid_truthy_args = ["TRUE", "True", "true", "t", "T", "Y", "y", "YES", "Yes", "yes"]
 
 
@@ -21,10 +21,7 @@ def update_spec_with_new_release(spec_file):
     print("New release value: {}".format(new_rel))
 
     return re.sub(
-        release_regex,
-        "# Release Start\nRelease:    \\1{}{}\n# Release End".format(new_rel, "%{?dist}"),
-        spec,
-        re.DOTALL,
+        release_regex, "# Release Start\nRelease:    \\1{}\\2\n# Release End".format(new_rel), spec, re.DOTALL
     )
 
 
