@@ -16,10 +16,24 @@ def update_spec_with_new_release(spec_file):
     spec = file.read()
     file.close()
 
-    release_regex = r".*# Release Start\nRelease:\s*(\d+|\d+\.\d+)(.*)\n# Release End.*"
-    return re.sub(
-        release_regex, "# Release Start\nRelease:    \\1.{}\\2\n# Release End".format(int(time.time())), spec, re.DOTALL
-    )
+    release_regex1 = r".*# Release Start\nRelease:\s*(\d+)([^\d]*)\n# Release End.*"
+    matches1 = re.findall(release_regex1, spec)
+
+    release_regex2 = r".*# Release Start\nRelease:\s*(\d+\.\d+)(.*)\n# Release End.*"
+    matches2 = matches2 = re.findall(release_regex2, spec)
+
+    if matches1:
+        [(val, rest)] = matches1
+
+        return re.sub(
+            release_regex1, "# Release Start\nRelease:    {}.{}{}\n# Release End".format(val, int(time.time()), rest), spec, re.DOTALL
+        )
+    if matches2:
+        [(val, rest)] = matches2
+
+        return re.sub(
+            release_regex2, "# Release Start\nRelease:    {}.{}{}\n# Release End".format(val[0:val.index(".")], int(time.time()), rest), spec, re.DOTALL
+        )
 
 
 def write_new_spec(spec_file, new_data):
