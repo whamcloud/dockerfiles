@@ -20,7 +20,7 @@ def update_spec_with_new_release(spec_file):
     matches1 = re.findall(release_regex1, spec)
 
     release_regex2 = r".*# Release Start\nRelease:\s*(\d+\.\d+)(.*)\n# Release End.*"
-    matches2 = matches2 = re.findall(release_regex2, spec)
+    matches2 = re.findall(release_regex2, spec)
 
     if matches1:
         [(val, rest)] = matches1
