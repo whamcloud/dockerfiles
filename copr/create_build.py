@@ -26,13 +26,21 @@ def update_spec_with_new_release(spec_file):
         [(val, rest)] = matches1
 
         return re.sub(
-            release_regex1, "# Release Start\nRelease:    {}.{}{}\n# Release End".format(val, int(time.time()), rest), spec, re.DOTALL
+            release_regex1,
+            "# Release Start\nRelease:    {}.{}{}\n# Release End".format(val, int(time.time()), rest),
+            spec,
+            re.DOTALL,
         )
     if matches2:
         [(val, rest)] = matches2
 
         return re.sub(
-            release_regex2, "# Release Start\nRelease:    {}.{}{}\n# Release End".format(val[0:val.index(".")], int(time.time()), rest), spec, re.DOTALL
+            release_regex2,
+            "# Release Start\nRelease:    {}.{}{}\n# Release End".format(
+                val[0 : val.index(".")], int(time.time()), rest
+            ),
+            spec,
+            re.DOTALL,
         )
 
 
