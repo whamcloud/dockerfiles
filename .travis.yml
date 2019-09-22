@@ -24,6 +24,14 @@ jobs:
         - docker build -t copr .
         - docker history copr
     - stage: build
+      name: "Build Copr Rust"
+      script:
+        - cd copr-rust
+        - docker build -t copr-rust:stable .
+        - docker history copr-rust:stable
+        - docker build -t copr-rust:nightly --build-arg toolchain=nightly .
+        - docker history copr-rust:nightly
+    - stage: build
       name: "Build Copr Lustre"
       script:
         - cd copr-lustre-client
@@ -74,6 +82,20 @@ jobs:
         - cd copr
         - docker build --rm -t imlteam/copr .
         - docker push imlteam/copr
+    - stage: cd_copr_rust_stable
+      name: "Copr Rust Stable Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-rust
+        - docker build --rm -t imlteam/copr-rust:stable .
+        - docker push imlteam/copr-rust:stable
+    - stage: cd_copr_rust_nightly
+      name: "Copr Rust Nightly Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-rust
+        - docker build --rm -t imlteam/copr-rust:nightly --build-arg toolchain=nightly .
+        - docker push imlteam/copr-rust:nightly
     - stage: cd_copr_lustre
       name: "Copr Lustre Continuous Deployment"
       script:
