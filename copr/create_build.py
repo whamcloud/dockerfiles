@@ -39,7 +39,7 @@ srpm_path = os.environ.get("SRPM_PATH", "/tmp/*.src.rpm")
 srpm_task = os.environ.get("SRPM_TASK", "srpm")
 prod = os.environ.get("PROD", False)
 local_only = os.environ.get("LOCAL_ONLY", False)
-build_dir = os.environ.get("GITHUB_WORKSPACE", "/build")
+workspace = os.environ.get("WORKSPACE", "/build")
 
 try:
     p = glob.glob(srpm_path).pop()
@@ -55,11 +55,11 @@ except Exception:
         [
             "make",
             "-f",
-            os.path.join(build_dir, ".copr/Makefile"),
+            os.path.join(workspace, ".copr/Makefile"),
             srpm_task,
             "outdir={}".format(srpm_path.replace(os.path.basename(srpm_path), "")),
         ],
-        cwd=build_dir,
+        cwd=workspace,
     )
 
     p = glob.glob(srpm_path).pop()
@@ -67,9 +67,9 @@ except Exception:
 if local_only in valid_truthy_args:
     print("Building the RPM's from SRPM Locally.")
     subprocess.call(
-        ["rpmbuild", "--rebuild", p, "-D", "%_topdir {}".format(os.path.join(build_dir, "_topdir"))], cwd=build_dir
+        ["rpmbuild", "--rebuild", p, "-D", "%_topdir {}".format(os.path.join(workspace, "_topdir"))], cwd=workspace
     )
-    print("RPM's located under: {}".format(os.path.join(build_dir, "_topdir/RPMS")))
+    print("RPM's located under: {}".format(os.path.join(workspace, "_topdir/RPMS")))
 else:
     subprocess.call(
         ["openssl", "aes-256-cbc", "-K", key, "-iv", iv, "-in", "/tmp/copr-mfl.enc", "-out", "/root/.config/copr", "-d"]
