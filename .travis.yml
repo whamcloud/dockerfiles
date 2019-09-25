@@ -139,11 +139,15 @@ stages:
     if: branch = master AND type = push AND fork = false
   - name: cd_copr
     if: branch = master AND type = push AND fork = false
+  - name: cd_copr_rust_stable
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr_rust_nightly
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr_wasm
+    if: branch = master AND type = push AND fork = false
   - name: cd_copr_lustre
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_zfs
-    if: branch = master AND type = push AND fork = false
-  - name: cd_copr_wasm
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_dotnet
     if: branch = master AND type = push AND fork = false
