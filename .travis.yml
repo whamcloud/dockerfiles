@@ -31,6 +31,8 @@ jobs:
         - docker history copr-rust:stable
         - docker build -t copr-rust:nightly --build-arg toolchain=nightly .
         - docker history copr-rust:nightly
+        - docker build -t copr-rust:beta --build-arg toolchain=beta .
+        - docker history copr-rust:beta
     - stage: build
       name: "Build Copr Lustre"
       script:
@@ -89,6 +91,13 @@ jobs:
         - cd copr-rust
         - docker build --rm -t imlteam/copr-rust:stable .
         - docker push imlteam/copr-rust:stable
+    - stage: cd_copr_rust_beta
+      name: "Copr Rust Beta Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-rust
+        - docker build --rm -t imlteam/copr-rust:beta --build-arg toolchain=beta .
+        - docker push imlteam/copr-rust:beta
     - stage: cd_copr_rust_nightly
       name: "Copr Rust Nightly Continuous Deployment"
       script:
@@ -140,6 +149,8 @@ stages:
   - name: cd_copr
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_rust_stable
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr_rust_beta
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_rust_nightly
     if: branch = master AND type = push AND fork = false
