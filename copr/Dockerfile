@@ -1,4 +1,4 @@
-FROM centos:latest
+FROM centos:7
 WORKDIR /build
 RUN yum install -y dnf epel-release \
   && yum install -y yum-plugin-copr \
