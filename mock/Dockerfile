@@ -1,4 +1,4 @@
-FROM centos:latest
+FROM centos:7
 
 RUN yum -y install epel-release yum-plugin-copr \
   && yum -y copr enable @mock/mock-stable \
