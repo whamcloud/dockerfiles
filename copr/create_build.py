@@ -18,7 +18,12 @@ def update_spec_with_new_release(spec_file):
 
     release_regex = r".*# Release Start\nRelease:\s*(\d+|\d+\.\d+)(.*)\n# Release End.*"
     return re.sub(
-        release_regex, "# Release Start\nRelease:    \\1.{}\\2\n# Release End".format(int(time.time())), spec, re.DOTALL
+        release_regex,
+        "# Release Start\nRelease:    \\1.{}\\2\n# Release End".format(
+            int(time.time())
+        ),
+        spec,
+        re.DOTALL,
     )
 
 
@@ -67,15 +72,34 @@ except Exception:
 if local_only in valid_truthy_args:
     print("Building the RPM's from SRPM Locally.")
     subprocess.call(
-        ["rpmbuild", "--rebuild", p, "-D", "%_topdir {}".format(os.path.join(workspace, "_topdir"))], cwd=workspace
+        [
+            "rpmbuild",
+            "--rebuild",
+            p,
+            "-D",
+            "%_topdir {}".format(os.path.join(workspace, "_topdir")),
+        ],
+        cwd=workspace,
     )
     print("RPM's located under: {}".format(os.path.join(workspace, "_topdir/RPMS")))
 else:
     subprocess.call(
-        ["openssl", "aes-256-cbc", "-K", key, "-iv", iv, "-in", "/tmp/copr-mfl.enc", "-out", "/root/.config/copr", "-d"]
+        [
+            "openssl",
+            "aes-256-cbc",
+            "-K",
+            key,
+            "-iv",
+            iv,
+            "-in",
+            "/tmp/copr-mfl.enc",
+            "-out",
+            "/root/.config/copr",
+            "-d",
+        ]
     )
 
-    client = Client.create_from_config_file()
+    client = Client.create_from_config_file("/root/.config/copr")
 
     args = (owner, project, package)
 
@@ -88,9 +112,18 @@ else:
     print("Uploading SRPM to Copr.")
     build = client.build_proxy.create_from_file(owner, project, p)
 
-    while client.build_proxy.get(build.id).state in ["running", "pending", "starting", "importing"]:
+    while client.build_proxy.get(build.id).state in [
+        "running",
+        "pending",
+        "starting",
+        "importing",
+    ]:
         time.sleep(10)
-        print("{} running. State: {}".format(build.id, client.build_proxy.get(build.id).state))
+        print(
+            "{} running. State: {}".format(
+                build.id, client.build_proxy.get(build.id).state
+            )
+        )
 
     final_state = client.build_proxy.get(build.id).state
 
