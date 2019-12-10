@@ -46,6 +46,12 @@ jobs:
         - docker build -t copr-zfs .
         - docker history copr-zfs
     - stage: build
+      name: "Build Copr kmod"
+      script:
+        - cd copr-kmod
+        - docker build -t copr-kmod .
+        - docker history copr-kmod  
+    - stage: build
       name: "Build Copr WASM"
       script:
         - cd copr-wasm
@@ -119,6 +125,13 @@ jobs:
         - cd copr-zfs
         - docker build --rm -t imlteam/copr-zfs .
         - docker push imlteam/copr-zfs
+    - stage: cd_copr_kmod
+      name: "Copr kmod Continuous Deployment"
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - cd copr-kmod
+        - docker build --rm -t imlteam/copr-kmod .
+        - docker push imlteam/copr-kmod
     - stage: cd_copr_wasm
       name: "Copr WASM Continuous Deployment"
       script:
@@ -159,6 +172,8 @@ stages:
   - name: cd_copr_lustre
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_zfs
+    if: branch = master AND type = push AND fork = false
+  - name: cd_copr_kmod
     if: branch = master AND type = push AND fork = false
   - name: cd_copr_dotnet
     if: branch = master AND type = push AND fork = false
