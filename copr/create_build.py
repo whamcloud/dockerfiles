@@ -56,7 +56,7 @@ except Exception:
         write_new_spec(spec, updated_spec)
 
     # Build the SRPM
-    subprocess.call(
+    subprocess.check_call(
         [
             "make",
             "-f",
@@ -71,7 +71,7 @@ except Exception:
 
 if local_only in valid_truthy_args:
     print("Building the RPM's from SRPM Locally.")
-    subprocess.call(
+    subprocess.check_call(
         [
             "rpmbuild",
             "--rebuild",
@@ -81,9 +81,10 @@ if local_only in valid_truthy_args:
         ],
         cwd=workspace,
     )
+
     print("RPM's located under: {}".format(os.path.join(workspace, "_topdir/RPMS")))
 else:
-    subprocess.call(
+    subprocess.check_call(
         [
             "openssl",
             "aes-256-cbc",
