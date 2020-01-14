@@ -84,7 +84,7 @@ if local_only in valid_truthy_args:
 
     print("RPM's located under: {}".format(os.path.join(workspace, "_topdir/RPMS")))
 else:
-    code = subprocess.check_call(
+    subprocess.check_call(
         [
             "openssl",
             "aes-256-cbc",
