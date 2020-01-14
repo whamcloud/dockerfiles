@@ -56,7 +56,7 @@ except Exception:
         write_new_spec(spec, updated_spec)
 
     # Build the SRPM
-    subprocess.call(
+    code = subprocess.call(
         [
             "make",
             "-f",
@@ -67,11 +67,14 @@ except Exception:
         cwd=workspace,
     )
 
+    if code != 0:
+        sys.exit(1)
+
     p = glob.glob(srpm_path).pop()
 
 if local_only in valid_truthy_args:
     print("Building the RPM's from SRPM Locally.")
-    subprocess.call(
+    code = subprocess.call(
         [
             "rpmbuild",
             "--rebuild",
@@ -81,9 +84,13 @@ if local_only in valid_truthy_args:
         ],
         cwd=workspace,
     )
+
+    if code != 0:
+        sys.exit(1)
+
     print("RPM's located under: {}".format(os.path.join(workspace, "_topdir/RPMS")))
 else:
-    subprocess.call(
+    code = subprocess.call(
         [
             "openssl",
             "aes-256-cbc",
@@ -98,6 +105,9 @@ else:
             "-d",
         ]
     )
+
+    if code != 0:
+        sys.exit(1)
 
     client = Client.create_from_config_file("/root/.config/copr")
 
