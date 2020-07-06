@@ -1,7 +1,9 @@
 FROM imlteam/copr
 
 ARG toolchain=stable
-RUN yum install -y gcc \
+RUN yum clean all \
+  && yum install -y gcc https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
+  && yum install -y postgresql96-devel \
   && yum clean all \
   && cd /root \
   && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $toolchain
