@@ -10,3 +10,7 @@ RUN yum clean all \
 ENV PATH $PATH:/root/.cargo/bin
 ENV CARGO_HOME /root/.cargo
 ENV RUSTUP_HOME /root/.rustup
+RUN cargo install sccache
+ENV SCCACHE_CACHE_SIZE="40G"
+ENV SCCACHE_DIR /.cache/sccache
+ENV RUSTC_WRAPPER="sccache"
