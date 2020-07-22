@@ -7,10 +7,13 @@ RUN yum clean all \
   && yum clean all \
   && cd /root \
   && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $toolchain
+RUN wget https://github.com/mozilla/sccache/releases/download/0.2.13/sccache-0.2.13-x86_64-unknown-linux-musl.tar.gz \
+  && tar -xzvf sccache-*-x86_64-unknown-linux-musl.tar.gz \
+  && mv sccache-*-x86_64-unknown-linux-musl/sccache /usr/bin \
+  && rm -rf sccache-*-x86_64-unknown-linux-musl*
 ENV PATH $PATH:/root/.cargo/bin
 ENV CARGO_HOME /root/.cargo
 ENV RUSTUP_HOME /root/.rustup
-RUN cargo install sccache
 ENV SCCACHE_CACHE_SIZE="40G"
 ENV SCCACHE_DIR /.cache/sccache
 ENV RUSTC_WRAPPER="sccache"
