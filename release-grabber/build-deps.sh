@@ -10,7 +10,7 @@ mkdir -p /tmp/iml-build
 cd /tmp/iml-build
 
 
-if [[ -v "$WITH_LUSTRE_PATCHLESS" ]]; then
+if [[ "$WITH_LUSTRE_PATCHLESS" = true && "$MANAGER_ONLY" != true ]]; then
     echo "Adding e2fsprogs repo"
 
     yum-config-manager --add-repo=https://downloads.whamcloud.com/public/e2fsprogs/latest/el7/
@@ -28,7 +28,7 @@ echo "Adding IML manager repos"
 yum-config-manager --add-repo=https://github.com/whamcloud/integrated-manager-for-lustre/releases/download/v$VERSION/chroma_support.repo
 yumdownloader --resolve -y python2-iml-manager
 
-if [[ ! -v "$MANAGER_ONLY" ]]; then
+if [[ "$MANAGER_ONLY" != true ]]; then
     echo "Adding IML agent repos"
     yumdownloader --resolve -y python2-iml-agent python2-iml-agent-management rust-iml-agent;
 fi
